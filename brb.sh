@@ -10,7 +10,7 @@ MASTERIP=10.0.0.0
 
 #----------Information and credentials to access the master as Slave User
 USER="amazonreplica"
-PASS="737g0t3am"
+PASS=""
 HOST=$MASTERIP
 IGONREDB="performance_schema | mysql"
 
@@ -18,12 +18,12 @@ cd mydumper
 echo "------------------------------"
 echo "------------------------------"
 echo "INICIANDO COPIA DE DATOS DEL MASTER"
-time ./mydumper -u amazon -p 737g0t3am --host $IPMASTER -r 4000000  -t 8 -e -v 3  --regex '^(?!($IGNOREDB))' -c -o ~/backup_dir &> ~/backup_dir/mydumper.log
+time ./mydumper -u amazon -p  --host $IPMASTER -r 4000000  -t 8 -e -v 3  --regex '^(?!($IGNOREDB))' -c -o ~/backup_dir &> ~/backup_dir/mydumper.log
 echo "Copia Finalizada"
 echo " Iniciando Restore"
-time ./myloader -u root -p letgo -t 8 -q 500 -v 3 -o -d  ~/backup_dir
+time ./myloader -u root -p  -t 8 -q 500 -v 3 -o -d  ~/backup_dir
 echo "Restore Finalizado"
-cd /home/santiago.lertora/backup_letgo
+cd ~/backup_dir
 
 echo "-------------------------------------------------------"
 echo " LEYENDO METADATA"
