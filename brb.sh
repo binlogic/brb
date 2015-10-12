@@ -9,7 +9,7 @@ MASTERIP=10.0.0.0
 #----------MyLoader Vars---------------
 
 #----------Information and credentials to access the master as Slave User
-USER="amazonreplica"
+USER="user"
 PASS=""
 HOST=$MASTERIP
 IGONREDB="performance_schema | mysql"
@@ -18,10 +18,10 @@ cd mydumper
 echo "------------------------------"
 echo "------------------------------"
 echo "INICIANDO COPIA DE DATOS DEL MASTER"
-time ./mydumper -u amazon -p  --host $IPMASTER -r 4000000  -t 8 -e -v 3  --regex '^(?!($IGNOREDB))' -c -o ~/backup_dir &> ~/backup_dir/mydumper.log
+time ./mydumper -u user -p  --host $IPMASTER -r 4000000  -t 8 -e -v 3  --regex '^(?!($IGNOREDB))' -c -o ~/backup_dir &> ~/backup_dir/mydumper.log
 echo "Copia Finalizada"
 echo " Iniciando Restore"
-time ./myloader -u root -p  -t 8 -q 500 -v 3 -o -d  ~/backup_dir
+time ./myloader -u user -p  -t 8 -q 10 -v 3 -o -d  ~/backup_dir
 echo "Restore Finalizado"
 cd ~/backup_dir
 
@@ -35,5 +35,5 @@ read -a pos <<<$POS
 read -a log <<<$LOG
 LOG1=${log[0]}
 POS1=${pos[0]}
-mysql -uroot -pletgo -e 'CHANGE MASTER TO MASTER_HOST='$HOST', MASTER_USER='$USER', MASTER_PASSWORD='$PASS', MASTER_LOG_FILE='$LOG1', MASTER_LOG_POS=$POS1; start slave;'
-mysql -uroot -pletgo -e 'show slave status\G'
+mysql -uroot -p -e 'CHANGE MASTER TO MASTER_HOST='$HOST', MASTER_USER='$USER', MASTER_PASSWORD='$PASS', MASTER_LOG_FILE='$LOG1', MASTER_LOG_POS=$POS1; start slave;'
+mysql -uroot -p -e 'show slave status\G'
