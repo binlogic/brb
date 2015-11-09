@@ -1,32 +1,40 @@
+#!/bin/bash
+# Binlogic Replica Builder
+# Santiago Lertora - Binlogic Inc. 2015
+
 
 #--- Execute on Master-- Grants for MyDumper Process
-GRANT USAGE ON *.* TO 'dump'@'%' IDENTIFIED BY 'slavepass';
-GRANT SELECT, LOCK TABLES ON `mysql`.* TO 'dump'@'%';
-GRANT SELECT, LOCK TABLES, SHOW VIEW, EVENT, TRIGGER ON `myschema`.* TO 'dump'@'%';
+#GRANT USAGE ON *.* TO 'santiagodba'@'%' IDENTIFIED BY 'pass';
+#GRANT SELECT, LOCK TABLES ON `mysql`.* TO 'santiagodba'@'%';
+#GRANT SELECT, LOCK TABLES, SHOW VIEW, EVENT, TRIGGER ON *.* TO 'santiagodba'@'%';
 
-MASTERIP=10.0.0.0
 
-#----------MyLoader Vars---------------
 
-#----------Information and credentials to access the master as Slave User
-USER="user"
-PASS=""
-HOST=$MASTERIP
-IGONREDB="performance_schema | mysql"
+MASTERUSER="user"
+MASTERPASS=pass"
+MASTERHOST="71.6.218.221"
 
-cd mydumper
-echo "------------------------------"
-echo "------------------------------"
-echo "INICIANDO COPIA DE DATOS DEL MASTER"
-time ./mydumper -u user -p  --host $IPMASTER -r 4000000  -t 8 -e -v 3  --regex '^(?!($IGNOREDB))' -c -o ~/backup_dir &> ~/backup_dir/mydumper.log
+SLAVEUSER="root"
+SLAVEPASS="tester"
+BKPDIR="backup"
+#cd mydumper
+echo "-----------------------------------------------"
+echo "-----------------------------------------------"
+echo "-------INICIANDO COPIA DE DATOS DEL MASTER-----"
+echo "-----------------------------------------------"
+time mydumper -u $MASTERUSER -p $MASTERPASS --host $MASTERHOST -r 4000000  -t 8 -e -v 3  --regex '^(?!(mysql|sys|performance_schema))' -c -o $BKPDIR &> $BKPDIR/mydumper.log
 echo "Copia Finalizada"
+echo "-----------------------------------------------"
+echo "--------------Parando Replica------------------"
+echo "-----------------------------------------------"
+mysql -u$SLAVEUSER -p$SLAVEPASS-e 'stop slave; reset slave all;'
 echo " Iniciando Restore"
-time ./myloader -u user -p  -t 8 -q 10 -v 3 -o -d  ~/backup_dir
+time myloader -u $SLAVEUSER -p $SLAVEPASS -t 8 -q 10 -v 3 -o -d  $BKPDIR
 echo "Restore Finalizado"
-cd ~/backup_dir
+cd $BKPDIR
 
 echo "-------------------------------------------------------"
-echo " LEYENDO METADATA"
+echo " LEYENDO METADATA"c
 echo " Iniciando Esclavo"
 
 POS=$(awk '/Pos:/{print $NF}' metadata)
@@ -35,5 +43,17 @@ read -a pos <<<$POS
 read -a log <<<$LOG
 LOG1=${log[0]}
 POS1=${pos[0]}
-mysql -uroot -p -e 'CHANGE MASTER TO MASTER_HOST='$HOST', MASTER_USER='$USER', MASTER_PASSWORD='$PASS', MASTER_LOG_FILE='$LOG1', MASTER_LOG_POS=$POS1; start slave;'
-mysql -uroot -p -e 'show slave status\G'
+mysql -u$SLAVEUSER -p$SLAVEPASS -e "CHANGE MASTER TO MASTER_HOST='$MASTERHOST', MASTER_USER='$MASTERUSER', MASTER_PASSWORD='$MASTERPASS', MASTER_LOG_FILE='$LOG1', MASTER_LOG_POS=$POS1 ;start slave; SHOW SLAVE STATUS\G";
+
+/usr/bin/curl \
+    -X POST \
+    -s \
+    --data-urlencode "payload={ \
+        \"channel\": \"#monitoring\", \
+        \"username\": \"Replica Builder\", \
+        \"pretext\": \"servername | $MONIT_DATE\", \
+        \"color\": \"danger\", \
+        \"icon_emoji\": \":ghost:\", \
+        \"text\": \"$MONIT_SERVICE - $MONIT_DESCRIPTION\" \
+    }" \
+    webhook
