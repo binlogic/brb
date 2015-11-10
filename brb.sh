@@ -11,7 +11,7 @@
 
 
 MASTERUSER="user"
-MASTERPASS=pass"
+MASTERPASS="pass"
 MASTERHOST="71.6.218.221"
 
 SLAVEUSER="root"
@@ -44,16 +44,16 @@ read -a log <<<$LOG
 LOG1=${log[0]}
 POS1=${pos[0]}
 mysql -u$SLAVEUSER -p$SLAVEPASS -e "CHANGE MASTER TO MASTER_HOST='$MASTERHOST', MASTER_USER='$MASTERUSER', MASTER_PASSWORD='$MASTERPASS', MASTER_LOG_FILE='$LOG1', MASTER_LOG_POS=$POS1 ;start slave; SHOW SLAVE STATUS\G";
-
+# Simple Slack Integration
 /usr/bin/curl \
     -X POST \
     -s \
     --data-urlencode "payload={ \
-        \"channel\": \"#monitoring\", \
+        \"channel\": \"#general\", \
         \"username\": \"Replica Builder\", \
         \"pretext\": \"servername | $MONIT_DATE\", \
         \"color\": \"danger\", \
         \"icon_emoji\": \":ghost:\", \
-        \"text\": \"$MONIT_SERVICE - $MONIT_DESCRIPTION\" \
+        \"text\": \"$SLAVEHOST - $REPLICA_FINALIZADA\" \
     }" \
-    webhook
+#Insert your incoming webhook here
