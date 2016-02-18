@@ -21,6 +21,7 @@ time mydumper -u $MASTERUSER -p $MASTERPASS --host $MASTERHOST -r 4000000  -t 8 
 if [ "$?" != "0" ]; then
 echo "backup failed"
 exit 1
+fi
 echo "Copia Finalizada"
 echo "-----------------------------------------------"
 echo "--------------Parando Replica------------------"
