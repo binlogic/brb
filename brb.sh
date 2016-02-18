@@ -3,16 +3,10 @@
 # Santiago Lertora - Binlogic Inc. 2015
 
 
-#--- Execute on Master-- Grants for MyDumper Process
-#GRANT USAGE ON *.* TO 'santiagodba'@'%' IDENTIFIED BY 'pass';
-#GRANT SELECT, LOCK TABLES ON `mysql`.* TO 'santiagodba'@'%';
-#GRANT SELECT, LOCK TABLES, SHOW VIEW, EVENT, TRIGGER ON *.* TO 'santiagodba'@'%';
-
-
 
 MASTERUSER="user"
 MASTERPASS="pass"
-MASTERHOST="71.6.218.221"
+MASTERHOST=ip"
 
 SLAVEUSER="root"
 SLAVEPASS="tester"
