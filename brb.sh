@@ -18,10 +18,7 @@ echo "-------INICIANDO COPIA DE DATOS DEL MASTER-----"
 echo "-----------------------------------------------"
 
 time mydumper -u $MASTERUSER -p $MASTERPASS --host $MASTERHOST -r 4000000  -t 8 -e -v 3  --regex '^(?!(mysql|sys|performance_schema))' -c -o $BKPDIR &> $BKPDIR/mydumper.log
-if [ "$?" != "0" ]; then
-echo "backup failed"
-exit 1
-fi
+
 echo "Copia Finalizada"
 echo "-----------------------------------------------"
 echo "--------------Parando Replica------------------"
