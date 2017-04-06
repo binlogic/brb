@@ -1,7 +1,7 @@
 #!/bin/bash
 # Binlogic Replica Builder
 # Santiago Lertora - Binlogic Inc. 2015
-
+#curso ale
 
 
 MASTERUSER="user"
